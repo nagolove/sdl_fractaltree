@@ -3,10 +3,12 @@
 // compile with: clang++ main.cpp -o hello_sdl2 -lSDL2
 // run with: ./hello_sdl2
 
+#include <numbers>
 #include <memory>
 #include <vector>
 #include <SDL2/SDL.h>
-#include "SDL_pixels.h"
+#include <SDL_pixels.h>
+#include <cmath>
 #include <iostream>
 #include <ostream>
 #include <stdio.h>
@@ -14,7 +16,15 @@
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
 
-std::vector<SDL_Surface*> surfaces = {};
+//const uint width  = 1920;
+//const uint height = 1080;
+
+double minLen = 10.;
+#define PI 3.1415
+//double angle = 26 * std::numbers::pi_v / 180
+double angle = 26 * PI / 180;
+//std::vector<SDL_Surface*> surfaces = {};
+std::vector<SDL_Surface*> surfaces;
 SDL_Renderer *renderer = nullptr;
 Uint64 timeTick, lastTimeTick;
 int mousex, mousey;
@@ -28,6 +38,54 @@ void freeAllSurfaces() {
     for (uint32_t i = 0; i < surfaces.size(); ++i) {
         SDL_FreeSurface(surfaces[i]);
     }
+}
+
+const double magic = 0.f;
+
+void rotate(double x, double y, double a, double *a_tmp, double *b_tmp) {
+    double s = sin(a), c = cos(a);
+    *a_tmp = x * c - y * s; *b_tmp = x * s + y * c;
+}
+
+Uint8 randColor() {
+    // TODO напишите ваш код здесь
+    return 1;
+}
+
+void branches(int deep, double a, double b, double len, double ang, double dir) {
+    len = len * magic;
+
+    if (len < minLen)
+        return;
+
+    if (dir > 0) ang -= angle; else ang += angle;
+
+    double vx = 0., vy = 0.;
+    rotate(0, len, ang, &vx, &vy);
+
+    vx = a + vx; vy = b - vy;
+    //int succ = SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
+    Uint8 r_, g_, b_, a_;
+    printf("color %d, %d, %d, %d\n", r_, g_, b_, a_);
+    SDL_SetRenderDrawColor(renderer, r_, g_, b_, a_);
+}
+
+void present() {
+    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
+    SDL_Rect d = {0, 0, 800, 600};
+    SDL_RenderFillRect(renderer, &d);
+
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderDrawLine(renderer, 0, 0, d.w, d.h);
+    SDL_RenderDrawLine(renderer, mousex-5, mousey-5, mousex+5, mousey+5);
+    SDL_RenderDrawLine(renderer, mousex-5, mousey+5, mousex+5, mousey-5);
+
+    //SDL_Color color = { .r = 255, .g = 255, .b = 255, .a = 255. };
+    SDL_Color color = { .r = 25, .g = 0, .b = 0, .a = 0 };
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    SDL_RenderDrawLine(renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    SDL_RenderPresent(renderer);
 }
 
 void loop() {
@@ -81,21 +139,7 @@ void loop() {
             SDL_GetMouseState(&mousex, &mousey);
         }
 
-        SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
-        SDL_Rect d = {0, 0, 800, 600};
-        SDL_RenderFillRect(renderer, &d);
-
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-        SDL_RenderDrawLine(renderer, 0, 0, d.w, d.h);
-        SDL_RenderDrawLine(renderer, mousex-5, mousey-5, mousex+5, mousey+5);
-        SDL_RenderDrawLine(renderer, mousex-5, mousey+5, mousex+5, mousey-5);
-
-        //SDL_Color color = { .r = 255, .g = 255, .b = 255, .a = 255. };
-        SDL_Color color = { .r = 25, .g = 0, .b = 0, .a = 0 };
-        SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-        SDL_RenderDrawLine(renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-        SDL_RenderPresent(renderer);
+        present();
     }
 }
 
