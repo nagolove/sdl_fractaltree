@@ -13,11 +13,14 @@
 #include <ostream>
 #include <stdio.h>
 
-#define SCREEN_WIDTH 1920
-#define SCREEN_HEIGHT 1080
+//#define SCREEN_WIDTH 1920
+//#define SCREEN_HEIGHT 1080
 
-//const uint width  = 1920;
-//const uint height = 1080;
+const uint SCREEN_WIDTH  = 1920;
+const uint SCREEN_HEIGHT = 1080;
+
+////const uint width  = 1920;
+////const uint height = 1080;
 
 double minLen = 10.;
 #define PI 3.1415
@@ -27,6 +30,12 @@ double angle = 26 * PI / 180;
 std::vector<SDL_Surface*> surfaces;
 SDL_Renderer *renderer = nullptr;
 Uint64 timeTick, lastTimeTick;
+
+double lineLen = 127.;
+double a_2 = SCREEN_WIDTH / 2, b_2 = SCREEN_HEIGHT - lineLen;
+double a_ = 0.;
+double b_ = 0.;
+
 int mousex, mousey;
 
 SDL_Surface* pushNewSurface(SDL_Surface* surf) {
@@ -52,11 +61,11 @@ Uint8 randColor() {
     return 1;
 }
 
-void branches(int deep, double a, double b, double len, double ang, double dir) {
+int branches(int deep, double a, double b, double len, double ang, double dir) {
     len = len * magic;
 
     if (len < minLen)
-        return;
+        return deep + 1;
 
     if (dir > 0) ang -= angle; else ang += angle;
 
@@ -68,6 +77,12 @@ void branches(int deep, double a, double b, double len, double ang, double dir) 
     Uint8 r_, g_, b_, a_;
     printf("color %d, %d, %d, %d\n", r_, g_, b_, a_);
     SDL_SetRenderDrawColor(renderer, r_, g_, b_, a_);
+}
+
+void fractaltree() {
+    double a = a_2, b = b_2;
+    int deep = 1;
+    branches(deep, a, b, lineLen, a_, b_);
 }
 
 void present() {
@@ -84,6 +99,8 @@ void present() {
     SDL_Color color = { .r = 25, .g = 0, .b = 0, .a = 0 };
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
     SDL_RenderDrawLine(renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    fractaltree();
 
     SDL_RenderPresent(renderer);
 }
