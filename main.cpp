@@ -62,6 +62,7 @@ Uint8 randColor() {
 }
 
 int branches(int deep, double a, double b, double len, double ang, double dir) {
+    printf("deep %d, r %d, g %d, b %d, a %a\n");
     len = len * magic;
 
     if (len < minLen)
@@ -77,6 +78,9 @@ int branches(int deep, double a, double b, double len, double ang, double dir) {
     Uint8 r_, g_, b_, a_;
     printf("color %d, %d, %d, %d\n", r_, g_, b_, a_);
     SDL_SetRenderDrawColor(renderer, r_, g_, b_, a_);
+
+    branches(deep, vx, vy, len, ang, 1);
+    branches(deep, vx, vy, len, ang, 0);
 }
 
 void fractaltree() {
